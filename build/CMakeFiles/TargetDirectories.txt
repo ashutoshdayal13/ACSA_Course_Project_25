@@ -1,0 +1,3 @@
+C:/workspace/sem7/sem/coa2/ACSA_Course_Project_25/build/CMakeFiles/tomasulo.dir
+C:/workspace/sem7/sem/coa2/ACSA_Course_Project_25/build/CMakeFiles/ALL_BUILD.dir
+C:/workspace/sem7/sem/coa2/ACSA_Course_Project_25/build/CMakeFiles/ZERO_CHECK.dir

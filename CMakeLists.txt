@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.12)
+project(tomasulo_simulator LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(PROJECT_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/src/*.cpp")
+add_executable(tomasulo ${SOURCES})
+target_include_directories(tomasulo PRIVATE ${PROJECT_INCLUDE_DIR})

@@ -1,0 +1,10 @@
+^C:\WORKSPACE\SEM7\SEM\COA2\ACSA_COURSE_PROJECT_25\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/workspace/sem7/sem/coa2/ACSA_Course_Project_25 -BC:/workspace/sem7/sem/coa2/ACSA_Course_Project_25/build --check-stamp-file C:/workspace/sem7/sem/coa2/ACSA_Course_Project_25/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
