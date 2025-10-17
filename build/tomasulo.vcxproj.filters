@@ -4,9 +4,6 @@
     <ClCompile Include="C:\workspace\sem7\sem\coa2\ACSA_Course_Project_25\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\workspace\sem7\sem\coa2\ACSA_Course_Project_25\src\test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\workspace\sem7\sem\coa2\ACSA_Course_Project_25\CMakeLists.txt" />

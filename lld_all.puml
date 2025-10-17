@@ -1,0 +1,252 @@
+@startuml
+
+enum Opcode {
+  ADD
+  SUB
+  MUL
+  DIV
+  LOAD
+  STORE
+  BRANCH
+  NOP
+}
+
+enum FUType {
+  ALU
+  MUL
+  LOADSTORE
+}
+
+class Operand {
+  +bool isRegister
+  +int regIndex
+  +long imm
+  +string toString()
+}
+
+class Instruction {
+  +uint64_t pc
+  +Opcode opcode
+  +int dest        
+  +Operand src1
+  +Operand src2
+  +int64_t imm
+  +string toString()
+  +static Instruction parse(const string &)
+}
+
+class Tag {
+  -int64 id
+  +Tag()
+  +Tag(int64)
+  +int64 getId()
+  +bool operator==(Tag const &)
+  +string toString()
+}
+
+class CDB <<Singleton>> {
+  -vector<IListener*> listeners
+  -function<int(vector<pair<Tag,long>>)> arbiter
+  +CDB()
+  +void subscribe(IListener* l)
+  +void unsubscribe(IListener* l)
+  +void broadcast(Tag tag, long value)
+  +void broadcastMultiple(vector<pair<Tag,long>> results)
+}
+
+interface IListener {
+  +void onBroadcast(Tag tag, long value)
+  +Tag getListeningTag()
+}
+
+class RSEntry {
+  +Tag tag
+  +bool busy
+  +Opcode op
+  +bool Vj_valid
+  +long Vj
+  +optional<Tag> Qj
+  +bool Vk_valid
+  +long Vk
+  +optional<Tag> Qk
+  +optional<Tag> destTag
+  +bool issuedToFU
+  +int cyclesRemaining
+  +Instruction instr
+  +void clear()
+  +bool isReady() : bool
+}
+
+class ReservationStation {
+  -vector<RSEntry> entries
+  -string name
+  +ReservationStation(string name, int size)
+  +optional<RSEntry*> allocate(const Instruction& instr, Tag destTag)
+  +void onBroadcast(Tag tag, long value)
+  +vector<RSEntry*> getReadyEntries()
+  +bool hasFreeEntry()
+  +string toString()
+}
+
+class ReservationStationManager {
+  -map<FUType, ReservationStation*> stations
+  +ReservationStationManager(const Config &cfg)
+  +optional<RSEntry*> allocateFor(const Instruction& instr, Tag destTag)
+  +void onBroadcast(Tag tag, long value)
+  +vector<RSEntry*> getReadyFor(FUType ft)
+  +bool hasFreeEntry(FUType ft)
+}
+
+interface IFunctionalUnit {
+  +bool assign(RSEntry* entry)
+  +void step()
+  +bool isFree()
+  +optional<pair<Tag,long>> fetchResultIfReady()
+  +FUType getType()
+}
+
+class FunctionalUnit {
+  -FUType type
+  -int latency
+  -RSEntry* currentEntry
+  -int cyclesLeft
+  +FunctionalUnit(FUType t, int latency)
+  +bool assign(RSEntry* entry)
+  +void step()
+  +bool isFree()
+  +optional<pair<Tag,long>> fetchResultIfReady()
+  +string toString()
+}
+
+class FunctionalUnitManager {
+  -vector<sharedptr<IFunctionalUnit>> units
+  +FunctionalUnitManager(const Config& cfg)
+  +optional<sharedptr<IFunctionalUnit>> findFreeUnit(FUType)
+  +void tickAll()
+  +vector<pair<Tag,long>> collectFinishedResults()
+}
+
+class ROBEntry {
+  +Tag id
+  +bool busy
+  +Opcode type
+  +int destReg
+  +optional<long> value
+  +bool ready
+  +Instruction instr
+}
+
+class ReorderBuffer {
+  -vector<ROBEntry> entries
+  -int head
+  -int tail
+  -int capacity
+  +ReorderBuffer(int capacity)
+  +optional<Tag> allocate(Opcode type, int destReg, const Instruction& instr)
+  +void markReady(Tag id, long value)
+  +optional<ROBEntry> tryCommit()
+  +bool hasFreeEntry()
+  +bool empty()
+}
+
+class RegisterFile {
+  -vector<long> regs
+  +RegisterFile(int n)
+  +long read(int idx)
+  +void write(int idx, long val)
+  +int size()
+}
+
+class RegisterStatus {
+  -vector<optional<Tag>> regToTag
+  +RegisterStatus(int n)
+  +optional<Tag> getTag(int reg)
+  +void setTag(int reg, Tag tag)
+  +void clearTagIfMatches(int reg, Tag tag)
+  +bool isReady(int reg)
+}
+
+class Memory {
+  -map<uint64_t,long> mem
+  +Memory()
+  +long load(uint64_t addr)
+  +void store(uint64_t addr, long value)
+}
+
+class LoadBuffer {
+  -vector<RSEntry> entries
+  +optional<RSEntry*> allocateLoad(const Instruction&)
+  +void onBroadcast(Tag tag, long value)
+  +vector<RSEntry*> getReadyLoads()
+}
+
+class StoreBuffer {
+  -vector<RSEntry> entries
+  +optional<RSEntry*> allocateStore(const Instruction&)
+  +void onBroadcast(Tag tag, long value)
+  +void commitStoresToMemory(Memory&, ReorderBuffer&)
+}
+
+class Config {
+  +int numRegisters
+  +int robSize
+  +map<FUType,int> fuLatencies
+  +map<FUType,int> rsSizes
+  +int issueWidth
+  +bool useROB
+  +Config()
+}
+
+class Logger {
+  +void log(string)
+  +void traceInstruction(uint64_t pc, string msg)
+  +void setVerbose(bool)
+}
+
+class Simulator {
+  -uint64_t clock
+  -Config cfg
+  -deque<Instruction> instrQueue
+  -ReservationStationManager* rsManager
+  -FunctionalUnitManager* fuManager
+  -RegisterFile* regFile
+  -RegisterStatus* regStatus
+  -ReorderBuffer* rob
+  -CDB* cdb
+  -Memory* memory
+  -LoadBuffer* lb
+  -StoreBuffer* sb
+  -Logger* logger
+  +Simulator(const Config&)
+  +void loadProgram(vector<Instruction>)
+  +void run()
+  +void step()
+  +bool isFinished()
+  +void debugDumpState()
+}
+
+Instruction --> Operand
+ReservationStation "1" o-- "*" RSEntry : contains
+ReservationStationManager "1" o-- "*" ReservationStation
+Simulator --> ReservationStationManager
+Simulator --> FunctionalUnitManager
+Simulator --> RegisterFile
+Simulator --> RegisterStatus
+Simulator --> ReorderBuffer
+Simulator --> CDB
+Simulator --> Memory
+Simulator --> LoadBuffer
+Simulator --> StoreBuffer
+Simulator --> Logger
+FunctionalUnitManager "1" o-- "*" FunctionalUnit
+FunctionalUnit ..|> IFunctionalUnit
+IListener <|.. ReservationStation
+IListener <|.. ReorderBuffer
+CDB --> IListener : notifies
+ReservationStationManager ..> RegisterStatus : query/set tags
+ReservationStationManager ..> RegisterFile : read immediate values
+ReorderBuffer ..> RegisterFile : commit writes
+StoreBuffer ..> ReorderBuffer : coordinates commit
+LoadBuffer ..> StoreBuffer : check older stores
+
+@enduml

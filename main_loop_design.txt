@@ -1,0 +1,1 @@
+Issue - Execute - Collect Results - CDB arbitration+broadcast - commit

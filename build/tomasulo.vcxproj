@@ -318,7 +318,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\workspace\sem7\sem\coa2\ACSA_Course_Project_25\src\main.cpp" />
-    <ClCompile Include="C:\workspace\sem7\sem\coa2\ACSA_Course_Project_25\src\test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\workspace\sem7\sem\coa2\ACSA_Course_Project_25\build\ZERO_CHECK.vcxproj">
