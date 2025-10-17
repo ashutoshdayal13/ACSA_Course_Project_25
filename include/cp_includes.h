@@ -16,8 +16,9 @@
 #include <cassert>
 #include <sstream>
 #include <fstream>
+
 using namespace std;
-using ll=long long;
+using ll=int64_t;
 using ld=long double;
-using lid=unsigned long long;
+using lid=uint64_t;
 constexpr ll INF=10000000000000000;

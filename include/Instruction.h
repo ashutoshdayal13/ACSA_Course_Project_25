@@ -11,4 +11,6 @@ public:
     ll dest;//arch reg
     ll imm;
     static Instruction parse(const string&);
+
+    string to_string() const override;
 };
