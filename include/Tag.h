@@ -7,11 +7,11 @@ public:
 
     bool operator==(const Tag&) const;
     bool operator<(const Tag&) const;
-    lid get_id();
+    ull get_id();
     string to_string() const override;
 private:
-    lid id;
+    ull id;
     static atomic<ll> nxt_id_;
     Tag()=default;
-    Tag(lid id_);
+    Tag(ull id_);
 };

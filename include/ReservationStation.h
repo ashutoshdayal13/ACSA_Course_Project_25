@@ -5,7 +5,7 @@ private:
     vector<RSEntry>entries;
     string name;
 public:
-    ReservationStation(string name,int size);
+    ReservationStation(string,int);
     optional<RSEntry*>allocate(const Instruction&,Tag);
     void on_broadcast(Tag,ll);
     vector<RSEntry*>get_ready_entries();

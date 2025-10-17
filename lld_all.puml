@@ -14,24 +14,25 @@ enum Opcode {
 enum FUType {
   ALU
   MUL
+  DIV
   LOADSTORE
 }
 
 class Operand {
-  +bool isRegister
-  +int regIndex
-  +long imm
-  +string toString()
+  +bool is_reg
+  +int reg_idx
+  +ll imm
+  +string to_string()
 }
 
 class Instruction {
-  +uint64_t pc
+  +ull pc
   +Opcode opcode
   +int dest        
   +Operand src1
   +Operand src2
   +int64_t imm
-  +string toString()
+  +string to_string()
   +static Instruction parse(const string &)
 }
 
@@ -39,24 +40,25 @@ class Tag {
   -int64 id
   +Tag()
   +Tag(int64)
-  +int64 getId()
+  +int64 get_id()
+  +bool operator<(Tag const &)
   +bool operator==(Tag const &)
-  +string toString()
+  +string to_string()
 }
 
 class CDB <<Singleton>> {
   -vector<IListener*> listeners
-  -function<int(vector<pair<Tag,long>>)> arbiter
+  -function<int(vector<pair<Tag,ll>>)> arbiter
   +CDB()
   +void subscribe(IListener* l)
   +void unsubscribe(IListener* l)
-  +void broadcast(Tag tag, long value)
-  +void broadcastMultiple(vector<pair<Tag,long>> results)
+  +void broadcast(Tag tag, ll value)
+  +void broadcast_multiple(vector<pair<Tag,ll>> results)
 }
 
 interface IListener {
-  +void onBroadcast(Tag tag, long value)
-  +Tag getListeningTag()
+  +void on_broadcast(Tag tag, ll value)
+  +Tag get_listening_tag()
 }
 
 class RSEntry {
@@ -64,14 +66,14 @@ class RSEntry {
   +bool busy
   +Opcode op
   +bool Vj_valid
-  +long Vj
+  +ll Vj
   +optional<Tag> Qj
   +bool Vk_valid
-  +long Vk
+  +ll Vk
   +optional<Tag> Qk
-  +optional<Tag> destTag
-  +bool issuedToFU
-  +int cyclesRemaining
+  +optional<Tag> dest_tag
+  +bool issued_to_FU
+  +int cycles_rem
   +Instruction instr
   +void clear()
   +bool isReady() : bool
@@ -82,56 +84,56 @@ class ReservationStation {
   -string name
   +ReservationStation(string name, int size)
   +optional<RSEntry*> allocate(const Instruction& instr, Tag destTag)
-  +void onBroadcast(Tag tag, long value)
-  +vector<RSEntry*> getReadyEntries()
-  +bool hasFreeEntry()
-  +string toString()
+  +void on_broadcast(Tag tag, ll value)
+  +vector<RSEntry*> get_ready_entries()
+  +bool has_free_entry()
+  +string to_string()
 }
 
 class ReservationStationManager {
   -map<FUType, ReservationStation*> stations
   +ReservationStationManager(const Config &cfg)
-  +optional<RSEntry*> allocateFor(const Instruction& instr, Tag destTag)
-  +void onBroadcast(Tag tag, long value)
-  +vector<RSEntry*> getReadyFor(FUType ft)
-  +bool hasFreeEntry(FUType ft)
+  +optional<RSEntry*> allocate_for(const Instruction& instr, Tag destTag)
+  +void on_broadcast(Tag tag, ll value)
+  +vector<RSEntry*> get_ready_for(FUType ft)
+  +bool has_free_entry(FUType ft)
 }
 
 interface IFunctionalUnit {
   +bool assign(RSEntry* entry)
   +void step()
-  +bool isFree()
-  +optional<pair<Tag,long>> fetchResultIfReady()
-  +FUType getType()
+  +bool is_free()
+  +optional<pair<Tag,ll>> fetch_result_if_ready()
+  +FUType get_type()
 }
 
 class FunctionalUnit {
   -FUType type
   -int latency
-  -RSEntry* currentEntry
-  -int cyclesLeft
+  -RSEntry* current_entry
+  -int cycles_left
   +FunctionalUnit(FUType t, int latency)
   +bool assign(RSEntry* entry)
   +void step()
-  +bool isFree()
-  +optional<pair<Tag,long>> fetchResultIfReady()
-  +string toString()
+  +bool is_free()
+  +optional<pair<Tag,ll>> fetch_result_if_ready()
+  +string to_string()
 }
 
 class FunctionalUnitManager {
   -vector<sharedptr<IFunctionalUnit>> units
   +FunctionalUnitManager(const Config& cfg)
-  +optional<sharedptr<IFunctionalUnit>> findFreeUnit(FUType)
-  +void tickAll()
-  +vector<pair<Tag,long>> collectFinishedResults()
+  +optional<sharedptr<IFunctionalUnit>> find_free_unit(FUType)
+  +void tick_all()
+  +vector<pair<Tag,ll>> collect_finished_results()
 }
 
 class ROBEntry {
   +Tag id
   +bool busy
   +Opcode type
-  +int destReg
-  +optional<long> value
+  +int dest_reg
+  +optional<ll> value
   +bool ready
   +Instruction instr
 }
@@ -142,87 +144,80 @@ class ReorderBuffer {
   -int tail
   -int capacity
   +ReorderBuffer(int capacity)
-  +optional<Tag> allocate(Opcode type, int destReg, const Instruction& instr)
-  +void markReady(Tag id, long value)
-  +optional<ROBEntry> tryCommit()
-  +bool hasFreeEntry()
+  +optional<Tag> allocate(Opcode type, int dest_reg, const Instruction& instr)
+  +void mark_ready(Tag id, ll value)
+  +optional<ROBEntry> try_commit()
+  +bool has_free_entry()
   +bool empty()
 }
 
 class RegisterFile {
-  -vector<long> regs
+  -vector<ll> regs
   +RegisterFile(int n)
-  +long read(int idx)
-  +void write(int idx, long val)
+  +ll read(int idx)
+  +void write(int idx, ll val)
   +int size()
 }
 
 class RegisterStatus {
-  -vector<optional<Tag>> regToTag
+  -vector<optional<Tag>> reg_to_tag
   +RegisterStatus(int n)
-  +optional<Tag> getTag(int reg)
-  +void setTag(int reg, Tag tag)
-  +void clearTagIfMatches(int reg, Tag tag)
-  +bool isReady(int reg)
+  +optional<Tag> get_tag(int reg)
+  +void set_tag(int reg, Tag tag)
+  +void clear_tag_if_matches(int reg, Tag tag)
+  +bool is_ready(int reg)
 }
 
 class Memory {
-  -map<uint64_t,long> mem
+  -map<ull,ll> mem
   +Memory()
-  +long load(uint64_t addr)
-  +void store(uint64_t addr, long value)
+  +ll load(ull addr)
+  +void store(ull addr, ll value)
 }
 
 class LoadBuffer {
   -vector<RSEntry> entries
-  +optional<RSEntry*> allocateLoad(const Instruction&)
-  +void onBroadcast(Tag tag, long value)
+  +optional<RSEntry*> allocate_load(const Instruction&)
+  +void on_broadcast(Tag tag, ll value)
   +vector<RSEntry*> getReadyLoads()
 }
 
 class StoreBuffer {
   -vector<RSEntry> entries
-  +optional<RSEntry*> allocateStore(const Instruction&)
-  +void onBroadcast(Tag tag, long value)
-  +void commitStoresToMemory(Memory&, ReorderBuffer&)
+  +optional<RSEntry*> allocate_store(const Instruction&)
+  +void on_broadcast(Tag tag, ll value)
+  +void commit_stores_to_memory(Memory&, ReorderBuffer&)
 }
 
 class Config {
-  +int numRegisters
-  +int robSize
-  +map<FUType,int> fuLatencies
-  +map<FUType,int> rsSizes
-  +int issueWidth
-  +bool useROB
+  +int num_registers
+  +int rob_size
+  +map<FUType,int> fu_latencies
+  +map<FUType,int> rs_sizes
+  +int issue_width
+  +bool use_ROB
   +Config()
 }
 
-class Logger {
-  +void log(string)
-  +void traceInstruction(uint64_t pc, string msg)
-  +void setVerbose(bool)
-}
-
 class Simulator {
-  -uint64_t clock
+  -ull clock
   -Config cfg
-  -deque<Instruction> instrQueue
-  -ReservationStationManager* rsManager
-  -FunctionalUnitManager* fuManager
-  -RegisterFile* regFile
-  -RegisterStatus* regStatus
+  -deque<Instruction> instr_queue
+  -ReservationStationManager* rs_manager
+  -FunctionalUnitManager* fu_manager
+  -RegisterFile* reg_file
+  -RegisterStatus* reg_status
   -ReorderBuffer* rob
   -CDB* cdb
   -Memory* memory
   -LoadBuffer* lb
   -StoreBuffer* sb
-  -Logger* logger
   +Simulator(const Config&)
-  +void loadProgram(vector<Instruction>)
+  +void load_program(vector<Instruction>)
   +void run()
   +void step()
-  +bool isFinished()
-  +void debugDumpState()
+  +bool is_finished()
+  +void debug_dump_state()
 }
 
 Instruction --> Operand
