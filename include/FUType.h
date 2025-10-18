@@ -1,4 +1,4 @@
-enum FPType{
+enum FUType{
     ALU,
     MUL,
     DIV,
