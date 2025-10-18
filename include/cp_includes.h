@@ -15,6 +15,7 @@
 #include <functional>
 #include <cassert>
 #include <sstream>
+#include <atomic>
 #include <fstream>
 
 using namespace std;
