@@ -5,6 +5,7 @@ cmake_policy(SET CMP0009 NEW)
 # SOURCES at CMakeLists.txt:5 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/workspace/sem7/sem/coa2/ACSA_Course_Project_25/src/*.cpp")
 set(OLD_GLOB
+  "C:/workspace/sem7/sem/coa2/ACSA_Course_Project_25/src/Tag.cpp"
   "C:/workspace/sem7/sem/coa2/ACSA_Course_Project_25/src/main.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")

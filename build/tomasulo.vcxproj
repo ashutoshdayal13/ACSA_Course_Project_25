@@ -317,6 +317,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="C:\workspace\sem7\sem\coa2\ACSA_Course_Project_25\src\Tag.cpp" />
     <ClCompile Include="C:\workspace\sem7\sem\coa2\ACSA_Course_Project_25\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -12,6 +12,6 @@ public:
 private:
     ull id;
     static atomic<ull> nxt_id_;
-    Tag():id(-1){}
+    Tag();
     Tag(ull id_);
 };

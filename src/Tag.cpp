@@ -13,7 +13,7 @@ Tag Tag::invalid(){
 }
 
 bool Tag::operator==(const Tag&o) const { return id==o.id; }
-bool Tag::operator<(const Tag&o) const {return id<o.id; }
+bool Tag::operator<(const Tag&o) const { return id<o.id; }
 
 ull Tag::get_id() const { return id; }
 
