@@ -1,23 +1,4 @@
-"""
-GUI front-end for the Tomasulo simulator.
-
-Place this file in the same folder as your other modules:
-- instruction.py
-- register_file.py
-- reservation_station.py
-- reorder_buffer.py
-- functional_unit.py
-- memory.py
-- tomasulo.py
-
-Run with:
-    python gui_tomasulo.py
-
-This GUI uses tkinter and provides controls to Step / Run / Pause / Reset the simulator,
-and shows live tables for: Program (instruction fetch), ROB, Reservation Stations, Registers, and Memory.
-
-It calls the Tomasulo.run_cycle() method to advance the simulator by one cycle.
-"""
+#https://chatgpt.com/share/68f8ba77-5804-8011-9216-624c2f8fb49b
 
 import tkinter as tk
 from tkinter import ttk, messagebox
